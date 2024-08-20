@@ -9,6 +9,7 @@ const C = -1732584194;
 const D = 271733878;
 
 const blockSizeInBits = 512;
+const blockSizeInWords = blockSizeInBits / 32;
 
 /**
  * Add integers, wrapping at 2^32.
@@ -56,25 +57,19 @@ function md5ii(a: number, b: number, c: number, d: number, x: number, s: number,
 }
 
 function pad(wordArray: number[], bitLength: number): number[] {
-  // Add the padding bit (0x80)
-  const lBytePosition = bitLength % 4;
-  const lWordCount = (bitLength - lBytePosition) / 4;
-
-  wordArray[lWordCount] = wordArray[lWordCount] || 0;
-  wordArray[lWordCount] |= 0x80 << (lBytePosition * 8);
-
-  // Calculate the total length in 32-bit words after padding
-  let lTotalWords = (((bitLength + 8) >>> 6) << 4) + 14;
-
-  // Zero pad the array to make its length congruent to 448 mod 512 (56 mod 64 bytes)
-  while (wordArray.length <= lTotalWords) {
+  //let oL = wordArray.length;
+  wordArray = wordArray.slice();
+  wordArray.push(0);
+  //wordArray.push(0);
+  //wordArray.push(0);
+  while ((wordArray.length * 32) % blockSizeInBits != 0) {
     wordArray.push(0);
   }
 
-  // Append the original length in bits at the end (64-bit integer, split into two 32-bit words)
-  const originalLengthBits = bitLength * 8;
-  wordArray[lTotalWords++] = originalLengthBits & 0xffffffff;
-  wordArray[lTotalWords] = originalLengthBits >>> 32;
+  //throw new Error("" + (bitLength >> 5) + " " + wordArray.length + " " + oL);
+  wordArray[(bitLength >> 5) % blockSizeInWords] |= 0x80 << bitLength % 32;
+  wordArray[wordArray.length - 2] = bitLength & 0xffffffff;
+  wordArray[wordArray.length - 1] = 0;
 
   return wordArray;
 }
@@ -186,7 +181,6 @@ function roundMd5(x: number[], H: number[]) {
  * @returns The array of integers representing the SHA-1 hash of message.
  */
 function finalizeMD5(remainder: number[], remainderBinLen: number, processedBinLen: number, H: number[]): number[] {
-  remainder.length = remainderBinLen / 32;
   const padded = pad(remainder, remainderBinLen + processedBinLen);
 
   return roundMd5(padded, H);
