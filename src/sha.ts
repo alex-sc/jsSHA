@@ -15,6 +15,7 @@ import jsSHA1 from "./sha1";
 import jsSHA256 from "./sha256";
 import jsSHA512 from "./sha512";
 import jsSHA3 from "./sha3";
+import jsMD5 from "./md5";
 
 type FixedLengthVariantType =
   | "SHA-1"
@@ -25,10 +26,11 @@ type FixedLengthVariantType =
   | "SHA3-224"
   | "SHA3-256"
   | "SHA3-384"
-  | "SHA3-512";
+  | "SHA3-512"
+  | "MD5";
 
 export default class jsSHA {
-  private readonly shaObj: jsSHA1 | jsSHA256 | jsSHA512 | jsSHA3;
+  private readonly shaObj: jsSHA1 | jsSHA256 | jsSHA512 | jsSHA3 | jsMD5;
   /**
    * @param variant The desired SHA variant (SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-256,
    *   SHA3-384, SHA3-512, SHAKE128, SHAKE256, CSHAKE128, CSHAKE256, KMAC128, or KMAC256) as a string.
@@ -50,7 +52,7 @@ export default class jsSHA {
   constructor(
     variant: FixedLengthVariantType,
     inputFormat: FormatNoTextType,
-    options?: FixedLengthOptionsNoEncodingType
+    options?: FixedLengthOptionsNoEncodingType,
   );
   constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: "TEXT", options?: SHAKEOptionsEncodingType);
   constructor(variant: "SHAKE128" | "SHAKE256", inputFormat: FormatNoTextType, options?: SHAKEOptionsNoEncodingType);
@@ -66,6 +68,8 @@ export default class jsSHA {
       this.shaObj = new jsSHA256(variant, inputFormat, options);
     } else if ("SHA-384" == variant || "SHA-512" == variant) {
       this.shaObj = new jsSHA512(variant, inputFormat, options);
+    } else if ("MD5" == variant) {
+      this.shaObj = new jsMD5(variant, inputFormat);
     } else if (
       "SHA3-224" == variant ||
       "SHA3-256" == variant ||

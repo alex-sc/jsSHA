@@ -75,6 +75,7 @@ declare class jsSHA {
     constructor(variant: "CSHAKE128" | "CSHAKE256", inputFormat: FormatNoTextType, options?: CSHAKEOptionsNoEncodingType);
     constructor(variant: "KMAC128" | "KMAC256", inputFormat: "TEXT", options: KMACOptionsEncodingType);
     constructor(variant: "KMAC128" | "KMAC256", inputFormat: FormatNoTextType, options: KMACOptionsNoEncodingType);
+    constructor(variant: "MD5" | "KMAC256", inputFormat: FormatNoTextType);
     /**
      * Takes `input` and hashes as many blocks as possible. Stores the rest for either a future `update` or `getHash` call.
      *
